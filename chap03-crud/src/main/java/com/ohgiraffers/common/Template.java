@@ -1,6 +1,7 @@
 package com.ohgiraffers.common;
 
 
+import com.ohgiraffers.section03.remix.model.MenuMapper;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.mapping.Environment;
@@ -52,6 +53,37 @@ public class Template {
 
                 // 매퍼 지정
                 configuration.addMapper(com.ohgiraffers.section02.javaconfig.model.MenuMapper.class);
+
+                sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return sqlSessionFactory.openSession(false);
+    }
+
+    public static SqlSession getRemixSqlSession() {
+        if (sqlSessionFactory == null) {
+            Properties properties = new Properties();
+            try {
+                properties.load(
+                        new FileReader("src/main/resources/java-config.properties"));
+                String driver = properties.getProperty("DRIVER");
+                String url = properties.getProperty("URL");
+                String user = properties.getProperty("USER");
+                String pass = properties.getProperty("PASSWORD");
+
+                Environment environment = new Environment(
+                        "dev",
+                        new JdbcTransactionFactory(),
+                        new PooledDataSource(driver, url, user, pass)
+                );
+
+                Configuration configuration = new Configuration(environment);
+
+                // 매퍼 지정
+                configuration.addMapper(MenuMapper.class);
 
                 sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
 

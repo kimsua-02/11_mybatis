@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ohgiraffers.section03.remix.model.MenuMapper">
+
+    <resultMap id="menuResultMap" type="com.ohgiraffers.dto.MenuDTO">
+        <id property="code" column="MENU_CODE"/>
+        <result property="name" column="MENU_NAME"/>
+        <result property="price" column="MENU_PRICE"/>
+        <result property="categoryCode" column="CATEGORYCODE"/>
+        <result property="orderableStatus" column="ORDERABLE_STATUS"/>
+    </resultMap>
+
+    <select id="selectAllMenu" resultMap="menuResultMap">
+        SELECT
+            MENU_CODE,
+            MENU_NAME,
+            MENU_PRICE,
+            CATEGORY_CODE,
+            ORDERABLESTATUS
+
+    </select>
+
+    <select id="selectMenuByCode" resultMap="menuResultMap">
+        SELECT
+        MENU_CODE,
+        MENU_NAME,
+        MENU_PRICE,
+        CATEGORY_CODE,
+        ORDERABLE_STATUS
+        FROM TBL_MENU
+        WHERE ORDERABLE_STATUS = 'Y'
+        AND MENU_CODE = #{ code }
+    </select>
+
+    <!-- parameterType 은 생략가능하지만 가독성과 여러 고려사향으로 인해 하는 것을 권장 -->
+
+    <!--
+        insert, update, delete 의 경우 기본 int 로 수행 결과를 반환한다.
+        파라미터로 전달된 DTO 의 필드명으로 값을 넣어야 하며,
+        getter 를 이용하므로 getter ㄱㅏ 없으면 ~,,
+        파라미터 타입도 생략 가능하다.
+    -->
+
+    <insert id="insertMenu" parameterType="com.ohgiraffers.dto.MenuDTO">
+        INSERT INTO TBL_MENU (
+        MENU_NAME,
+        MENU_PRICE,
+        CATEGORY_CODE,
+        ORDERABLE_STATUS
+        ) VALUES (
+        #{name},
+        #{price},
+        #{cotegoryCode},
+        'Y'
+    </insert>
+
+    <update id="updateMenu" parameterType="com.ohgiraffers.dto.MenuDTO">
+        UPDATE
+        MENU_CODE,
+        MENU_NAME,
+        MENU_PRICE,
+        CATEGORY_STATUS
+        ) VALUES (
+        #{code},
+        #{name},
+        #{price},
+        #{cotegoryCode},
+        'Y'
+    </update>
+
+</mapper>
