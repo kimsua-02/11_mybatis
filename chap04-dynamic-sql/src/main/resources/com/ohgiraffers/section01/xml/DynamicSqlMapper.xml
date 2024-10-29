@@ -40,4 +40,94 @@
         </if>
     </select>
 
+    <select id="searchMenu" parameterType="SearchCriteria" resultMap="menuResultMap">
+        SELECT
+            A.MENU_CODE,
+            A.MENU_NAME,
+            A.MENU_PRICE,
+            A.CATEGORY_CODE,
+            A.ORDERABLE_STATUS
+        FROM TBL_MENU A
+        <if test="condition == 'category'">
+            JOIN TBL_CATEGORY B ON (A.CATEGORY_CODE = B.CATEGORY_CODE)
+        </if>
+        WHERE A.ORDERABLE_STATUS = 'Y'
+        <if test="condition == 'name'">
+            AND A.MENU_NAME LIKE CONCAT ('%' , #{value}, '%')
+        </if>
+        <if test="condition == 'category'">
+            AND B.CATEGORY_NAME = #{value}
+        </if>
+    </select>
+
+    <!--  choose 태그 : 자바의 switch-case 문 역할을 한다.  -->
+    <!--
+        <choose>
+            <when test = 조건>
+                퀴리구문
+            </when>
+            ...
+            <otherwise>
+                쿼리구문
+            </otherwise>
+            어떠한 when 조건도 충족하지 못하면 otherwise 구문을 쿼리에 포함한다.
+      -->
+    <select id="searchMenuBySupCategory" parameterType="SearchCriteria" resultMap="menuResultMap">
+        SELECT
+            A. MENU_CODE,
+            A.MENU_NAME,
+            A.MENU_PRICE,
+            A.CATEGORY_CODE,
+            A.ORDERABLE_STATUS
+        FROM TBL_MENU A
+        JOIN TBL_CATEGORY B ON (A.CATEGORY_CODE = B.CATEGORY_CODE)
+        WHERE A.ORDERABLE_STATUS = 'Y'
+        <choose>
+            <when test="value == '식사'">
+                AND B.REF_CATEGORY_CODE = 1
+            </when>
+            <when test="value == '음료'">
+                AND B.REF_CATEGORY_CODE = 2
+            </when>
+            <otherwise>
+                AND B.REF_CATEGORY_CODE = 3
+            </otherwise>
+        </choose>
+    </select>
+
+    <!--  <foreach> 태그 : 자바의 for 문 역할을 한다.
+            1. collection 속성 : 반복을 수행할 대상
+            2. item 속성 : 반복을 수행할 때마다 꺼내올 값의 이름 설정
+            3. open 속성 :  foreach 엘리먼트 구문의 가장 앞에 올 문자
+            4. separator 속성 : 반복이 수행될 때 꺼내온 item 사이에 들어갈 문자
+            5. close 속성 : 구문의 가장 마지막에 올 문자
+      -->
+    <select id="searchMenuByRandomMenuCode" parameterType="hashmap" resultMap="menuResultMap">
+        SELECT
+            MENU_CODE,
+            MENU_NAME,
+            MENU_PRICE,
+            CATEGORY_CODE,
+            ORDERABLE_STATUS
+        FROM TBL_MENU
+        WHERE ORDERABLE_STATUS = 'Y'
+          AND MENU_CODE IN
+        <foreach collection="randomMenuCodeList" item="menuCode" open="(" separator=", " close=")">
+            #{menuCode}
+        </foreach>
+    </select>
+
+    <select id="searchMenuByCoddOrSearchAll" parameterType="SearchCriteria" resultMap="menuResultMap">
+        SELECT
+            MENU_CODE,
+            MENU_NAME,
+            MENU_PRICE,
+            CATEGORY_CODE,
+            ORDERABLE_STATUS
+        FROM TBL_MENU
+        <if test="condition != null and condition eq 'menuCode'">
+            WHERE MENU_CODE = #{value}
+        </if>
+    </select>
+
 </mapper>
